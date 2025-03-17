@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Import Eligibility Checker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js" defer></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-8">
+    <h1 class="text-2xl font-semibold mb-6">Cat Import Eligibility Checker</h1>
+
+    <label class="block mb-2">
+        <input type="checkbox" id="rnatt" class="mr-2"> RNATT Declaration Issued
+    </label>
+
+    <label class="block mb-4">
+        First Internal Parasite Test Date:
+        <input type="date" id="internalParasite1" class="mt-1 block w-full border-gray-300 rounded">
+    </label>
+
+    <label class="block mb-4">
+        Second Internal Parasite Test Date:
+        <input type="date" id="internalParasite2" class="mt-1 block w-full border-gray-300 rounded">
+    </label>
+
+    <label class="block mb-4">
+        External Parasite Treatment Dates (comma-separated if repeated):
+        <input type="text" id="externalParasite" placeholder="YYYY-MM-DD, YYYY-MM-DD" class="mt-1 block w-full border-gray-300 rounded">
+    </label>
+
+    <label class="block mb-4">
+        Manufacturer's Repeat Interval (days):
+        <input type="number" id="repeatInterval" placeholder="e.g., 14" class="mt-1 block w-full border-gray-300 rounded">
+    </label>
+
+    <label class="block mb-4">
+        Date Cat Arrives in Australia:
+        <input type="date" id="arrivalDate" class="mt-1 block w-full border-gray-300 rounded">
+    </label>
+
+    <button id="checkButton" class="bg-blue-500 text-white px-4 py-2 rounded">Check Eligibility</button>
+
+    <div id="result" class="mt-6 font-semibold"></div>
+</div>
+
+<script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+        dayjs.extend(dayjs_plugin_customParseFormat);
+
+        document.getElementById('checkButton').addEventListener('click', checkEligibility);
+
+        function checkEligibility() {
+            const rnattIssued = document.getElementById('rnatt').checked;
+            const internal1 = dayjs(document.getElementById('internalParasite1').value);
+            const internal2 = dayjs(document.getElementById('internalParasite2').value);
+            const externalDatesInput = document.getElementById('externalParasite').value.split(',').map(date => dayjs(date.trim(), 'YYYY-MM-DD'));
+            const repeatInterval = parseInt(document.getElementById('repeatInterval').value, 10);
+            const arrival = dayjs(document.getElementById('arrivalDate').value);
+            const resultDiv = document.getElementById('result');
+
+            if (!rnattIssued) {
+                resultDiv.innerHTML = '<span class="text-red-600">Not valid: RNATT declaration must be issued first.</span>';
+                return;
+            }
+
+            if (!internal1.isValid() || !internal2.isValid() || internal2.diff(internal1, 'day') < 14) {
+                resultDiv.innerHTML = '<span class="text-red-600">Not valid: Internal parasite tests must be at least 14 days apart.</span>';
+                return;
+            }
+
+            if (arrival.diff(internal2, 'day') > 5 || arrival.diff(internal2, 'day') < 0) {
+                resultDiv.innerHTML = '<span class="text-red-600">Not valid: The second internal parasite test must be done within 5 days before arrival.</span>';
+                return;
+            }
+
+            if (!externalDatesInput.every(date => date.isValid())) {
+                resultDiv.innerHTML = '<span class="text-red-600">Not valid: Check external parasite treatment dates format.</span>';
+                return;
+            }
+
+            const lastExternalDate = externalDatesInput.reduce((latest, date) => date.isAfter(latest) ? date : latest);
+            if (arrival.diff(lastExternalDate, 'day') > 21 || arrival.diff(lastExternalDate, 'day') < 0) {
+                resultDiv.innerHTML = '<span class="text-red-600">Not valid: Latest external parasite treatment must be within 21 days before arrival.</span>';
+                return;
+            }
+
+            for (let i = 1; i < externalDatesInput.length; i++) {
+                if (externalDatesInput[i].diff(externalDatesInput[i - 1], 'day') !== repeatInterval) {
+                    resultDiv.innerHTML = '<span class="text-red-600">Not valid: External parasite treatments must follow manufacturer’s repeat interval of ' + repeatInterval + ' days.</span>';
+                    return;
+                }
+            }
+
+            resultDiv.innerHTML = '<span class="text-green-600">Valid: All conditions satisfied.</span>';
+        }
+    });
+</script>
+
+</body>
+</html>
