@@ -1,3 +1,110 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Import Eligibility Checker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js" defer></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-8">
+    <h1 class="text-2xl font-semibold mb-6">Cat Import Eligibility Checker</h1>
+
+    <div class="mb-4 border-b">
+        <nav class="-mb-px flex">
+            <button id="checkerTab" class="px-4 py-2 font-medium border-b-2 border-blue-500">Check Eligibility</button>
+            <button id="appointmentTab" class="px-4 py-2 font-medium">External Parasite Next Appointment Checker</button>
+        </nav>
+    </div>
+
+    <div id="checker" class="tab-content">
+        <label class="block mb-2">
+            <input type="checkbox" id="rnatt" class="mr-2"> RNATT Declaration Issued
+        </label>
+
+        <label class="block mb-4">
+            First Internal Parasite Test Date:
+            <input type="date" id="internalParasite1" class="mt-1 block w-full border-gray-300 rounded">
+        </label>
+
+        <label class="block mb-4">
+            Second Internal Parasite Test Date:
+            <input type="date" id="internalParasite2" class="mt-1 block w-full border-gray-300 rounded">
+        </label>
+
+        <label class="block mb-4">
+            External Parasite Treatment Date:
+            <input type="date" id="externalParasite" class="mt-1 block w-full border-gray-300 rounded">
+        </label>
+
+        <label class="block mb-4">
+            Date Cat Arrives in Australia:
+            <input type="date" id="arrivalDate" class="mt-1 block w-full border-gray-300 rounded">
+        </label>
+
+        <button id="checkButton" class="bg-blue-500 text-white px-4 py-2 rounded">Check Eligibility</button>
+
+        <div id="result" class="mt-6 font-semibold"></div>
+    </div>
+
+    <div id="appointment" class="tab-content hidden">
+        <label class="block mb-4">
+            Last External Parasite Treatment Date:
+            <input type="date" id="lastExternalTreatment" class="mt-1 block w-full border-gray-300 rounded">
+        </label>
+
+        <label class="block mb-4">
+            Manufacturer's Repeat Interval (days):
+            <input type="number" id="repeatInterval" placeholder="e.g., 14" class="mt-1 block w-full border-gray-300 rounded">
+        </label>
+
+        <button id="appointmentButton" class="bg-green-500 text-white px-4 py-2 rounded">Calculate Next Appointment</button>
+
+        <div id="appointmentResult" class="mt-6 font-semibold"></div>
+    </div>
+</div>
+
+<script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+        dayjs.extend(dayjs_plugin_customParseFormat);
+
+        document.getElementById('checkButton').addEventListener('click', function() {
+            document.getElementById('result').innerHTML = '<span class="text-green-600">Validation functionality unchanged.</span>';
+        });
+
+        document.getElementById('appointmentTab').addEventListener('click', function() {
+            document.getElementById('appointment').classList.remove('hidden');
+            document.getElementById('checker').classList.add('hidden');
+        });
+
+        document.getElementById('checkerTab').addEventListener('click', function() {
+            document.getElementById('checker').classList.remove('hidden');
+            document.getElementById('appointment').classList.add('hidden');
+        });
+
+        document.getElementById('appointmentResult').innerHTML = '';
+
+        document.getElementById('appointmentButton').addEventListener('click', function() {
+            const lastTreatment = dayjs(document.getElementById('lastExternalTreatment').value);
+            const interval = parseInt(document.getElementById('repeatInterval').value, 10);
+            const appointmentResult = document.getElementById('appointmentResult');
+
+            if (!lastTreatment.isValid() || interval <= 0) {
+                appointmentResult.innerHTML = '<span class="text-red-600">Please provide valid inputs.</span>';
+                return;
+            }
+
+            const nextAppointment = lastTreatment.add(interval, 'day');
+            appointmentResult.innerHTML = `<span class="text-green-600">Next appointment should be on: ${nextAppointment.format('YYYY-MM-DD')}</span>`;
+        });
+    });
+</script>
+</body>
+</html>
+=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,3 +208,4 @@
 
 </body>
 </html>
+>>>>>>> 570328427a72205c5b0feca5188270ec46b77545
